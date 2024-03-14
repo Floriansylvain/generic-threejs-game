@@ -81,7 +81,7 @@ function App() {
             height={300}
           />
           <Vignette eskil={false} offset={0.2} darkness={0.8} />
-          <SSAO
+          {/* <SSAO
             blendFunction={BlendFunction.MULTIPLY}
             samples={30}
             rings={4}
@@ -97,7 +97,7 @@ function App() {
             worldProximityFalloff={0.5}
             worldProximityThreshold={0.5}
             intensity={30}
-          ></SSAO>
+          ></SSAO> */}
           <ChromaticAberration
             modulationOffset={0.02}
             radialModulation={true}
