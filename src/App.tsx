@@ -3,13 +3,20 @@ import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls } from "@react-three/drei";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
-import { Vector3 } from "three";
+import { Vector2, Vector3 } from "three";
 import { Cubes } from "./components/Cubes";
 import { Player } from "./components/Player";
-import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  SSAO,
+  Vignette,
+} from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
 
 function App() {
-  const CUBES_QT = 20;
+  const CUBES_QT = 10;
 
   const container = useRef<HTMLCanvasElement>(null);
 
@@ -38,12 +45,10 @@ function App() {
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0, 0]}
           receiveShadow
+          castShadow
         >
           <planeGeometry attach={"geometry"} args={[100, 100]}></planeGeometry>
-          <meshStandardMaterial
-            attach={"material"}
-            color={"green"}
-          ></meshStandardMaterial>
+          <meshLambertMaterial color={"green"}></meshLambertMaterial>
         </mesh>
 
         <KeyboardControls
@@ -64,29 +69,43 @@ function App() {
         </KeyboardControls>
 
         <ambientLight intensity={Math.PI / 2} />
-        <directionalLight
-          castShadow
-          position={[100, 100, 100]}
-          shadow-mapSize={[4096, 4096]}
-          intensity={5}
-        >
-          <orthographicCamera
-            attach="shadow-camera"
-            args={[-50, 50, 50, -50]}
-          />
-        </directionalLight>
 
         <color args={["lightblue"]} attach={"background"}></color>
         <fog attach={"fog"} args={["lightblue", 0, 100]}></fog>
-        <gridHelper args={[100, 100]}></gridHelper>
-        <axesHelper args={[100]}></axesHelper>
-        <EffectComposer>
+        {/* <gridHelper args={[100, 100]}></gridHelper> */}
+        {/* <axesHelper args={[100]}></axesHelper> */}
+        <EffectComposer enableNormalPass>
           <Bloom
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.8}
+            luminanceThreshold={0.3}
+            luminanceSmoothing={1.2}
             height={300}
           />
           <Vignette eskil={false} offset={0.2} darkness={0.8} />
+          <SSAO
+            blendFunction={BlendFunction.MULTIPLY}
+            samples={30}
+            rings={4}
+            distanceThreshold={1.0}
+            distanceFalloff={0.0}
+            rangeThreshold={0.5}
+            rangeFalloff={0.1}
+            luminanceInfluence={0.9}
+            radius={20}
+            bias={0.5}
+            worldDistanceFalloff={0.5}
+            worldDistanceThreshold={0.5}
+            worldProximityFalloff={0.5}
+            worldProximityThreshold={0.5}
+            intensity={30}
+          ></SSAO>
+          <ChromaticAberration
+            modulationOffset={0.02}
+            radialModulation={true}
+            offset={new Vector2(0.002, 0.002)}
+            blendFunction={BlendFunction.NORMAL}
+          />
+
+          {/* <SSR thickness={1} intensity={0.1}></SSR> */}
         </EffectComposer>
       </Canvas>
     </main>

@@ -3,9 +3,9 @@ import { Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 
 export function Cubes(props: { cubesPosition: Vector3[] }) {
-  const CUBE_SPEED = 10;
-  const CUBE_AMPLITUDE = 2;
-  const CUBE_HEIGHT = 4;
+  const CUBE_SPEED = 1;
+  const CUBE_AMPLITUDE = 3;
+  const CUBE_HEIGHT = 1;
 
   const [cubes, setCubes] = useState<Vector3[]>(
     Array.from(props.cubesPosition)
@@ -35,12 +35,10 @@ export function Cubes(props: { cubesPosition: Vector3[] }) {
         key={`${cube.x}-${cube.z}`}
         castShadow
         receiveShadow
+        scale={[1, 1, 1]}
       >
         <boxGeometry attach={"geometry"}></boxGeometry>
-        <meshStandardMaterial
-          attach={"material"}
-          color={"hotpink"}
-        ></meshStandardMaterial>
+        <meshLambertMaterial color={"hotpink"}></meshLambertMaterial>
       </mesh>
     );
   });

@@ -17,6 +17,9 @@ dependencies:
   '@types/three':
     specifier: ^0.162.0
     version: 0.162.0
+  postprocessing:
+    specifier: ^6.35.2
+    version: 6.35.2(three@0.162.0)
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -26,6 +29,9 @@ dependencies:
   three:
     specifier: ^0.162.0
     version: 0.162.0
+  three-csm:
+    specifier: ^4.2.1
+    version: 4.2.1
 
 devDependencies:
   '@types/react':
@@ -2236,6 +2242,10 @@ packages:
   /text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
     dev: true
+
+  /three-csm@4.2.1:
+    resolution: {integrity: sha512-yHxKNPB2XMUBgWQTIWR0pESXzGYOdID49f2LdTbz+pNJRzBIMMVEJp5JuRSeCU6c75lmL5L4+FXRHQ1tQIgWEg==}
+    dev: false
 
   /three-mesh-bvh@0.7.3(three@0.162.0):
     resolution: {integrity: sha512-3W6KjzmupjfE89GuHPT31kxKWZ4YGZPEZJNysJpiOZfQRsBQQgmK7v/VJPpjG6syhAvTnY+5Fr77EvIkTLpGSw==}

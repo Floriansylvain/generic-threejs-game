@@ -1,7 +1,20 @@
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { MutableRefObject, useCallback, useEffect, useState } from "react";
-import { Euler, Mesh, Quaternion, Vector2, Vector3 } from "three";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  DirectionalLight,
+  Euler,
+  Mesh,
+  Quaternion,
+  Vector2,
+  Vector3,
+} from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
 export interface KeyPressed {
@@ -13,7 +26,8 @@ export interface KeyPressed {
   sprint: boolean;
 }
 
-const PLAYER_SPEED = 4.75; // TODO NERF
+const PLAYER_SPEED = 4.75;
+const SHADOW_DRAW_DISTANCE = 30;
 
 export function Player(props: {
   container: MutableRefObject<HTMLCanvasElement>;
@@ -33,6 +47,8 @@ export function Player(props: {
   const [player, setPlayer] = useState<Vector3>(new Vector3(0, 0, 0));
   const [mouseRef, setMouseRef] = useState(new Vector2());
 
+  const lightRef = useRef<DirectionalLight>(null);
+
   const camera = useThree((state) => state.camera);
 
   const radius = 2;
@@ -41,7 +57,10 @@ export function Player(props: {
   useEffect(() => {
     idle?.play();
     model.scene.traverse((child) => {
-      if (child instanceof Mesh) child.castShadow = true;
+      if (child instanceof Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
     });
   });
 
@@ -135,6 +154,24 @@ export function Player(props: {
   return (
     <>
       <primitive object={model.scene} position={player}></primitive>
+      <directionalLight
+        ref={lightRef}
+        target={model.scene}
+        castShadow
+        position={[player.x + 100, 100, player.z + 100]}
+        shadow-mapSize={[4096, 4096]}
+        intensity={6}
+      >
+        <orthographicCamera
+          attach="shadow-camera"
+          args={[
+            -SHADOW_DRAW_DISTANCE,
+            SHADOW_DRAW_DISTANCE,
+            SHADOW_DRAW_DISTANCE,
+            -SHADOW_DRAW_DISTANCE,
+          ]}
+        />
+      </directionalLight>
     </>
   );
 }
