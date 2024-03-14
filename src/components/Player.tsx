@@ -15,7 +15,6 @@ import {
   Vector2,
   Vector3,
 } from "three";
-import { degToRad } from "three/src/math/MathUtils.js";
 
 export interface KeyPressed {
   moveForward: boolean;
@@ -63,50 +62,36 @@ export function Player(props: {
     });
   });
 
+  const moveVector = new Vector3();
+  const moveEuler = new Euler();
+  const targetRotation = new Quaternion();
+  const rotationEuler = new Euler();
+
   useFrame((_, delta) => {
-    const move = new Vector3();
     const player = model.scene.position;
+    moveVector.set(0, 0, 0);
 
-    // TODO Replace getKeys with the subscription system
-    if (getKeys().moveForward) move.z += 1;
-    if (getKeys().moveBackward) move.z -= 1;
-    if (getKeys().moveLeft) move.x += 1;
-    if (getKeys().moveRight) move.x -= 1;
+    if (getKeys().moveForward) moveVector.z += 1;
+    if (getKeys().moveBackward) moveVector.z -= 1;
+    if (getKeys().moveLeft) moveVector.x += 1;
+    if (getKeys().moveRight) moveVector.x -= 1;
 
-    move.applyEuler(new Euler(0, pivotX - degToRad(180), 0));
-    move.multiplyScalar(PLAYER_SPEED * delta);
+    moveVector.applyEuler(moveEuler.set(0, pivotX - Math.PI, 0));
+    moveVector.multiplyScalar(PLAYER_SPEED * delta);
+
+    model.nodes?.Head.rotateX(pivotY - model.nodes?.Head.rotation.x);
+
+    if (Object.values(getKeys()).some((key) => key)) {
+      player.add(moveVector);
+
+      targetRotation.setFromEuler(rotationEuler.set(0, pivotX - Math.PI, 0));
+      model.scene.quaternion.slerp(targetRotation, 0.2);
+    }
 
     camera.position.x = radius * Math.sin(pivotX) * Math.cos(pivotY) + player.x;
     camera.position.y = radius * Math.sin(pivotY) + player.y + yOffset;
     camera.position.z = radius * Math.cos(pivotX) * Math.cos(pivotY) + player.z;
-
-    const adujstedPos = new Vector3().copy(model.scene.position);
-    adujstedPos.y += yOffset;
-
-    model.nodes?.Head.rotateX(pivotY - model.nodes?.Head.rotation.x);
-
-    camera.lookAt(adujstedPos);
-
-    if (Object.values(getKeys()).some((key) => key)) {
-      player.add(move);
-
-      const targetRotation = new Quaternion();
-
-      const cameraRotation = new Euler().setFromQuaternion(
-        camera.quaternion,
-        "YXZ"
-      );
-      targetRotation.multiplyQuaternions(
-        targetRotation,
-        new Quaternion().setFromEuler(
-          new Euler(0, cameraRotation.y - Math.PI, 0)
-        )
-      );
-
-      model.scene.quaternion.slerp(targetRotation, 0.2);
-    } else {
-      //a
-    }
+    camera.lookAt(player.x, player.y + yOffset, player.z);
   });
 
   const onMouseMove = useCallback((event: MouseEvent) => {
