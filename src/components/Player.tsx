@@ -44,7 +44,6 @@ export function Player(props: {
 
   const [pivotX, setPivotX] = useState(0);
   const [pivotY, setPivotY] = useState(0);
-  const [player, setPlayer] = useState<Vector3>(new Vector3(0, 0, 0));
   const [mouseRef, setMouseRef] = useState(new Vector2());
 
   const lightRef = useRef<DirectionalLight>(null);
@@ -66,6 +65,8 @@ export function Player(props: {
 
   useFrame((_, delta) => {
     const move = new Vector3();
+    const player = model.scene.position;
+
     // TODO Replace getKeys with the subscription system
     if (getKeys().moveForward) move.z += 1;
     if (getKeys().moveBackward) move.z -= 1;
@@ -87,17 +88,9 @@ export function Player(props: {
     camera.lookAt(adujstedPos);
 
     if (Object.values(getKeys()).some((key) => key)) {
-      setPlayer(player.clone().add(move));
-      setIsWalking(true);
+      player.add(move);
 
       const targetRotation = new Quaternion();
-      targetRotation.setFromEuler(
-        new Euler(
-          0,
-          pivotX + degToRad((Math.atan2(move.x, move.z) * 180) / Math.PI),
-          0
-        )
-      );
 
       const cameraRotation = new Euler().setFromQuaternion(
         camera.quaternion,
@@ -105,12 +98,14 @@ export function Player(props: {
       );
       targetRotation.multiplyQuaternions(
         targetRotation,
-        new Quaternion().setFromEuler(new Euler(0, -cameraRotation.y, 0))
+        new Quaternion().setFromEuler(
+          new Euler(0, cameraRotation.y - Math.PI, 0)
+        )
       );
 
       model.scene.quaternion.slerp(targetRotation, 0.2);
     } else {
-      setIsWalking(false);
+      //a
     }
   });
 
@@ -153,12 +148,19 @@ export function Player(props: {
 
   return (
     <>
-      <primitive object={model.scene} position={player}></primitive>
+      <primitive
+        object={model.scene}
+        position={model.scene.position}
+      ></primitive>
       <directionalLight
         ref={lightRef}
         target={model.scene}
         castShadow
-        position={[player.x + 100, 100, player.z + 100]}
+        position={[
+          model.scene.position.x + 100,
+          100,
+          model.scene.position.z + 100,
+        ]}
         shadow-mapSize={[2048, 2048]}
         intensity={6}
       >
