@@ -1,7 +1,7 @@
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { MutableRefObject, useCallback, useEffect, useState } from "react";
-import { Euler, Quaternion, Vector2, Vector3 } from "three";
+import { Euler, Mesh, Quaternion, Vector2, Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
 export interface KeyPressed {
@@ -13,13 +13,15 @@ export interface KeyPressed {
   sprint: boolean;
 }
 
+const PLAYER_SPEED = 4.75; // TODO NERF
+
 export function Player(props: {
   container: MutableRefObject<HTMLCanvasElement>;
 }): JSX.Element {
   const model = useGLTF("/Adventurer.glb");
   const animations = useAnimations(model.animations, model.scene);
 
-  //   const walk = animations.actions["CharacterArmature|Walk"];
+  // const walk = animations.actions["CharacterArmature|Walk"];
   const run = animations.actions["CharacterArmature|Run"];
   const idle = animations.actions["CharacterArmature|Idle"];
 
@@ -30,6 +32,7 @@ export function Player(props: {
   const [pivotY, setPivotY] = useState(0);
   const [player, setPlayer] = useState<Vector3>(new Vector3(0, 0, 0));
   const [mouseRef, setMouseRef] = useState(new Vector2());
+
   const camera = useThree((state) => state.camera);
 
   const radius = 2;
@@ -37,20 +40,21 @@ export function Player(props: {
 
   useEffect(() => {
     idle?.play();
+    model.scene.traverse((child) => {
+      if (child instanceof Mesh) child.castShadow = true;
+    });
   });
 
   useFrame((_, delta) => {
-    const speed = 8;
     const move = new Vector3();
     // TODO Replace getKeys with the subscription system
-    // const keyPressed = getKeys() as unknown as KeyPressed;
     if (getKeys().moveForward) move.z += 1;
     if (getKeys().moveBackward) move.z -= 1;
     if (getKeys().moveLeft) move.x += 1;
     if (getKeys().moveRight) move.x -= 1;
 
     move.applyEuler(new Euler(0, pivotX - degToRad(180), 0));
-    move.multiplyScalar(speed * delta);
+    move.multiplyScalar(PLAYER_SPEED * delta);
 
     camera.position.x = radius * Math.sin(pivotX) * Math.cos(pivotY) + player.x;
     camera.position.y = radius * Math.sin(pivotY) + player.y + yOffset;
@@ -66,11 +70,7 @@ export function Player(props: {
     if (Object.values(getKeys()).some((key) => key)) {
       setPlayer(player.clone().add(move));
       setIsWalking(true);
-    } else {
-      setIsWalking(false);
-    }
 
-    if (isWalking) {
       const targetRotation = new Quaternion();
       targetRotation.setFromEuler(
         new Euler(
@@ -89,7 +89,9 @@ export function Player(props: {
         new Quaternion().setFromEuler(new Euler(0, -cameraRotation.y, 0))
       );
 
-      model.scene.quaternion.slerp(targetRotation, 0.05);
+      model.scene.quaternion.slerp(targetRotation, 0.2);
+    } else {
+      setIsWalking(false);
     }
   });
 
