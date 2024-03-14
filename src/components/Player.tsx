@@ -159,7 +159,7 @@ export function Player(props: {
         target={model.scene}
         castShadow
         position={[player.x + 100, 100, player.z + 100]}
-        shadow-mapSize={[4096, 4096]}
+        shadow-mapSize={[2048, 2048]}
         intensity={6}
       >
         <orthographicCamera

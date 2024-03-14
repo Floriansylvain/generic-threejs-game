@@ -10,7 +10,6 @@ import {
   Bloom,
   ChromaticAberration,
   EffectComposer,
-  SSAO,
   Vignette,
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
