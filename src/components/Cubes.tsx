@@ -38,7 +38,10 @@ export function Cubes(props: { cubesPosition: Vector3[] }) {
         scale={[1, 1, 1]}
       >
         <boxGeometry attach={"geometry"}></boxGeometry>
-        <meshLambertMaterial color={"hotpink"}></meshLambertMaterial>
+        <meshLambertMaterial
+          color={"hotpink"}
+          toneMapped={false}
+        ></meshLambertMaterial>
       </mesh>
     );
   });
