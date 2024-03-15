@@ -31,7 +31,12 @@ function App() {
       className="container"
       onClick={() => container.current?.requestPointerLock()}
     >
-      <Canvas className="canvas" ref={container} shadows camera={{ fov: 50 }}>
+      <Canvas
+        className="canvas"
+        ref={container}
+        shadows
+        camera={{ fov: 50, frustumCulled: true, near: 0.1, far: 100 }}
+      >
         <Cubes cubesPosition={cubes}></Cubes>
 
         <mesh
@@ -63,7 +68,6 @@ function App() {
         <ambientLight intensity={Math.PI / 2} />
 
         <color args={["lightblue"]} attach={"background"}></color>
-        <fog attach={"fog"} args={["lightblue", 0, 100]}></fog>
         {/* <gridHelper args={[100, 100]}></gridHelper> */}
         {/* <axesHelper args={[100]}></axesHelper> */}
         <EffectComposer enableNormalPass>

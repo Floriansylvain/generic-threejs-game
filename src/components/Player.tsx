@@ -20,13 +20,16 @@ export interface KeyPressed {
   sprint: boolean;
 }
 
-const PLAYER_SPEED = 4.75;
-const SHADOW_DRAW_DISTANCE = 30;
+const PLAYER_SPEED = 4.75 * 10;
+const DRAW_DISTANCE = 50;
+const SHADOW_RESOLUTION = 2048;
 const MOUSE_X_SENSITIVITY = 0.002;
 const MOUSE_Y_SENSITIVITY = 0.001;
 const ANIM_SPEED = 0.2;
 const CAMERA_RADIUS = 2;
 const CAMERA_HEIGHT = 1.5;
+
+const SHADOW_DRAW_DISTANCE = DRAW_DISTANCE * 1.2;
 
 export function Player(): JSX.Element {
   const model = useGLTF("/Adventurer.glb");
@@ -206,7 +209,7 @@ export function Player(): JSX.Element {
           100,
           model.scene.position.z + 100,
         ]}
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[SHADOW_RESOLUTION, SHADOW_RESOLUTION]}
         intensity={6}
       >
         <orthographicCamera
@@ -219,6 +222,10 @@ export function Player(): JSX.Element {
           ]}
         />
       </directionalLight>
+      <fog
+        attach={"fog"}
+        args={["lightblue", DRAW_DISTANCE * 0.8, DRAW_DISTANCE]}
+      ></fog>
     </>
   );
 }
