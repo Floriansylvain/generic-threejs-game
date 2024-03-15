@@ -3,7 +3,7 @@ import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
-import { Vector3 } from "three";
+import { PCFSoftShadowMap, Vector3 } from "three";
 import { Player } from "./components/Player";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Cubes } from "./components/Cubes";
@@ -34,8 +34,8 @@ function App() {
       <Canvas
         className="canvas"
         ref={container}
-        shadows
-        camera={{ fov: 50, frustumCulled: true, near: 0.1, far: 100 }}
+        shadows={{ type: PCFSoftShadowMap }}
+        camera={{ fov: 50, frustumCulled: true, near: 0.1, far: 500 }}
       >
         <Cubes cubesPosition={cubes}></Cubes>
 
@@ -45,7 +45,10 @@ function App() {
           receiveShadow
           castShadow
         >
-          <planeGeometry attach={"geometry"} args={[50, 50]}></planeGeometry>
+          <planeGeometry
+            attach={"geometry"}
+            args={[5000, 5000]}
+          ></planeGeometry>
           <meshStandardMaterial
             toneMapped={false}
             color={"green"}

@@ -1,6 +1,6 @@
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import {
   DirectionalLight,
   Euler,
@@ -21,8 +21,8 @@ export interface KeyPressed {
 }
 
 const PLAYER_SPEED = 4.75 * 10;
-const DRAW_DISTANCE = 50;
-const SHADOW_RESOLUTION = 2048;
+const DRAW_DISTANCE = 256;
+const SHADOW_RESOLUTION = 4096;
 const MOUSE_X_SENSITIVITY = 0.002;
 const MOUSE_Y_SENSITIVITY = 0.001;
 const ANIM_SPEED = 0.2;
@@ -35,8 +35,8 @@ export function Player(): JSX.Element {
   const model = useGLTF("/Adventurer.glb");
   const anims = useAnimations(model.animations, model.scene);
   const [, getKeys] = useKeyboardControls();
-  const lightRef = useRef<DirectionalLight>(null);
   const camera = useThree((state) => state.camera);
+  const dirLightRef: MutableRefObject<DirectionalLight | null> = useRef(null);
 
   const pivot = new Vector2();
   const moveVector = new Vector3();
@@ -174,6 +174,14 @@ export function Player(): JSX.Element {
     });
   }
 
+  function setDirLightPosition(): void {
+    dirLightRef.current?.position.set(
+      model.scene.position.x + 100,
+      100,
+      model.scene.position.z + 100
+    );
+  }
+
   useFrame((_, delta) => {
     setMoveVector(delta);
     setAnimationsState();
@@ -181,6 +189,7 @@ export function Player(): JSX.Element {
     if (someKeyPressed()) setPlayerPosition();
     setCameraPosition();
     setPlayerAnimations();
+    setDirLightPosition();
   });
 
   useEffect(() => {
@@ -201,14 +210,9 @@ export function Player(): JSX.Element {
         position={model.scene.position}
       ></primitive>
       <directionalLight
-        ref={lightRef}
+        ref={dirLightRef}
         target={model.scene}
         castShadow
-        position={[
-          model.scene.position.x + 100,
-          100,
-          model.scene.position.z + 100,
-        ]}
         shadow-mapSize={[SHADOW_RESOLUTION, SHADOW_RESOLUTION]}
         intensity={6}
       >
