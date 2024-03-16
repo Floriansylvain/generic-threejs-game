@@ -21,8 +21,8 @@ export interface KeyPressed {
 }
 
 const PLAYER_SPEED = 4.75 * 10;
-const DRAW_DISTANCE = 256;
-const SHADOW_RESOLUTION = 4096;
+const DRAW_DISTANCE = 128;
+const SHADOW_RESOLUTION = 2048;
 const MOUSE_X_SENSITIVITY = 0.002;
 const MOUSE_Y_SENSITIVITY = 0.001;
 const ANIM_SPEED = 0.2;
@@ -177,7 +177,7 @@ export function Player(): JSX.Element {
   function setDirLightPosition(): void {
     dirLightRef.current?.position.set(
       model.scene.position.x + 100,
-      100,
+      70,
       model.scene.position.z + 100
     );
   }
@@ -199,6 +199,7 @@ export function Player(): JSX.Element {
         child.receiveShadow = true;
       }
     });
+    model.scene.position.y = 10;
     window.addEventListener("mousemove", onMouseMove);
     return () => window.removeEventListener("mousemove", onMouseMove);
   });

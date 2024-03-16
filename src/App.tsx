@@ -3,10 +3,11 @@ import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
-import { PCFSoftShadowMap, Vector3 } from "three";
+import { PCFSoftShadowMap, Vector2, Vector3 } from "three";
 import { Player } from "./components/Player";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Cubes } from "./components/Cubes";
+import { World } from "./components/World";
 
 const CUBES_QT = 10;
 
@@ -39,7 +40,7 @@ function App() {
       >
         <Cubes cubesPosition={cubes}></Cubes>
 
-        <mesh
+        {/* <mesh
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0, 0]}
           receiveShadow
@@ -53,7 +54,12 @@ function App() {
             toneMapped={false}
             color={"green"}
           ></meshStandardMaterial>
-        </mesh>
+        </mesh> */}
+
+        <World position={new Vector2(0, 0)} seed={0.12354}></World>
+        <World position={new Vector2(100, 0)} seed={0.12354}></World>
+        <World position={new Vector2(100, 100)} seed={0.12354}></World>
+        <World position={new Vector2(0, 100)} seed={0.12354}></World>
 
         <KeyboardControls
           map={[
@@ -68,11 +74,11 @@ function App() {
           <Player></Player>
         </KeyboardControls>
 
-        <ambientLight intensity={Math.PI / 2} />
+        <ambientLight intensity={1} />
 
         <color args={["lightblue"]} attach={"background"}></color>
-        {/* <gridHelper args={[100, 100]}></gridHelper> */}
-        {/* <axesHelper args={[100]}></axesHelper> */}
+        {/* <gridHelper args={[100, 100]}></gridHelper>
+        <axesHelper args={[100]}></axesHelper> */}
         <EffectComposer enableNormalPass>
           <Bloom mipmapBlur luminanceThreshold={0.4} />
           <Vignette eskil={false} offset={0.2} darkness={0.8} />
