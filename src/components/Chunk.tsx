@@ -1,5 +1,6 @@
 import {
   ClampToEdgeWrapping,
+  FrontSide,
   RepeatWrapping,
   TextureLoader,
   Vector2,
@@ -7,11 +8,15 @@ import {
 } from "three";
 import { ImprovedNoise } from "three/examples/jsm/Addons.js";
 
-export function World(props: { position: Vector2; seed: number }): JSX.Element {
+export function Chunk(props: { position: Vector2; seed: number }): JSX.Element {
   const size = 100;
-  const scale = 3;
+  const scale = 1.5;
   const amplitude = 30;
-  const overlap = 0.5; // Amount of overlap between chunks
+  const overlap = 0.5;
+  const geometry = 50;
+  const chunkSize = 100;
+
+  const adjustedGeometry = geometry + overlap * 2;
 
   const noise = (x: number, y: number): number => {
     const noise = new ImprovedNoise();
@@ -66,7 +71,7 @@ export function World(props: { position: Vector2; seed: number }): JSX.Element {
       >
         <planeGeometry
           attach="geometry"
-          args={[100, 100, 100 + overlap * 2, 100 + overlap * 2]}
+          args={[chunkSize, chunkSize, adjustedGeometry, adjustedGeometry]}
         ></planeGeometry>
         <meshStandardMaterial
           toneMapped={false}
@@ -74,6 +79,7 @@ export function World(props: { position: Vector2; seed: number }): JSX.Element {
           map={grassTexture}
           displacementMap={displacementMap}
           displacementScale={amplitude}
+          shadowSide={FrontSide}
         />
       </mesh>
     </group>

@@ -1,6 +1,6 @@
 import { useAnimations, useGLTF, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { MutableRefObject, useContext, useEffect, useRef } from "react";
 import {
   DirectionalLight,
   Euler,
@@ -10,6 +10,7 @@ import {
   Vector3,
 } from "three";
 import { AnimationState } from "../models/Animations";
+import { GameContext } from "../hooks/GameContext";
 
 export interface KeyPressed {
   moveForward: boolean;
@@ -52,6 +53,8 @@ export function Player(): JSX.Element {
     { name: "CharacterArmature|Run_Back", isPlaying: false },
   ];
   const lastAnimState = {} as AnimationState;
+
+  const useGameContext = useContext(GameContext);
 
   const setAnimState = (name: string, isPlaying: boolean): void => {
     const anim = animsState.find((anim) => anim.name === name);
@@ -148,6 +151,7 @@ export function Player(): JSX.Element {
       rotateBackwards();
     }
     interpolatePlayerQuaternionToTargetRotation();
+    useGameContext.playerPosition.copy(model.scene.position);
   }
 
   function setCameraPosition(): void {
@@ -200,6 +204,9 @@ export function Player(): JSX.Element {
       }
     });
     model.scene.position.y = 10;
+    if (dirLightRef.current) {
+      dirLightRef.current.shadow.bias = -0.0001;
+    }
     window.addEventListener("mousemove", onMouseMove);
     return () => window.removeEventListener("mousemove", onMouseMove);
   });
