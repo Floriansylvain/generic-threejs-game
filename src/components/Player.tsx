@@ -21,8 +21,7 @@ export interface KeyPressed {
   sprint: boolean;
 }
 
-const PLAYER_SPEED = 4.75 * 10;
-const DRAW_DISTANCE = 128;
+const PLAYER_SPEED = 4.5 * 100;
 const SHADOW_RESOLUTION = 2048;
 const MOUSE_X_SENSITIVITY = 0.002;
 const MOUSE_Y_SENSITIVITY = 0.001;
@@ -30,7 +29,7 @@ const ANIM_SPEED = 0.2;
 const CAMERA_RADIUS = 2;
 const CAMERA_HEIGHT = 1.5;
 
-const SHADOW_DRAW_DISTANCE = DRAW_DISTANCE * 1.2;
+const SHADOW_DRAW_DISTANCE = 128;
 
 export function Player(): JSX.Element {
   const model = useGLTF("/Adventurer.glb");
@@ -181,7 +180,7 @@ export function Player(): JSX.Element {
   function setDirLightPosition(): void {
     dirLightRef.current?.position.set(
       model.scene.position.x + 100,
-      70,
+      model.scene.position.y + 100,
       model.scene.position.z + 100
     );
   }
@@ -203,7 +202,7 @@ export function Player(): JSX.Element {
         child.receiveShadow = true;
       }
     });
-    model.scene.position.y = 10;
+    model.scene.position.y = 70;
     if (dirLightRef.current) {
       dirLightRef.current.shadow.bias = -0.0001;
     }
@@ -234,10 +233,7 @@ export function Player(): JSX.Element {
           ]}
         />
       </directionalLight>
-      <fog
-        attach={"fog"}
-        args={["lightblue", DRAW_DISTANCE * 0.8, DRAW_DISTANCE]}
-      ></fog>
+      <fog attach={"fog"} args={["lightblue", 1000, 2000]}></fog>
     </>
   );
 }
