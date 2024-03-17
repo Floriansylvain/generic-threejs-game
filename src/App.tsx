@@ -37,7 +37,7 @@ function App() {
         className="canvas"
         ref={container}
         shadows={{ type: PCFSoftShadowMap }}
-        camera={{ fov: 50, frustumCulled: true, near: 0.1, far: 129 }}
+        camera={{ fov: 50, frustumCulled: true, near: 0.1, far: 200 }}
       >
         <Cubes cubesPosition={cubes}></Cubes>
 
@@ -52,17 +52,12 @@ function App() {
           >
             <Player></Player>
             <ChunkGenerator></ChunkGenerator>
-            {/* <Chunk position={new Vector2(0, 0)} seed={2234180}></Chunk>
-            <Chunk position={new Vector2(100, 0)} seed={2234180}></Chunk>
-            <Chunk position={new Vector2(0, 100)} seed={2234180}></Chunk> */}
           </KeyboardControls>
         </GameContext.Provider>
 
         <ambientLight intensity={1} />
 
         <color args={["lightblue"]} attach={"background"}></color>
-        {/* <gridHelper args={[100, 100]}></gridHelper>
-        <axesHelper args={[100]}></axesHelper> */}
         <EffectComposer enableNormalPass>
           <Bloom mipmapBlur luminanceThreshold={0.4} />
           <Vignette eskil={false} offset={0.2} darkness={0.8} />

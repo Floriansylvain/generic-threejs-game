@@ -15,12 +15,13 @@ const grassTexture = new TextureLoader().load("./texture_grass.jpg");
 grassTexture.wrapS = grassTexture.wrapT = RepeatWrapping;
 grassTexture.repeat.set(100, 100);
 
-const SIZE = 100;
-const SCALE = 1.5;
-const AMPLITUDE = 30;
-const OVERLAP = 0.5;
+const SCALE = 5;
+const AMPLITUDE = 10;
 const GEOMETRY = 50;
-const CHUNK_SIZE = 100;
+
+const SIZE = 100; // CHANGE WITH CAUTION
+const OVERLAP = 0.5; // CHANGE WITH CAUTION
+const CHUNK_SIZE = 100; // CHANGE WITH CAUTION
 
 const ADJUSTED_GEOMETRY = GEOMETRY + OVERLAP * 2;
 const ADJUSTED_SIZE = SIZE + OVERLAP * 2;
