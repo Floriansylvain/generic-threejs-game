@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   ClampToEdgeWrapping,
   FrontSide,
@@ -8,45 +9,46 @@ import {
 } from "three";
 import { ImprovedNoise } from "three/examples/jsm/Addons.js";
 
+const canvas = document.createElement("canvas", { is: "canvas" });
+
+const grassTexture = new TextureLoader().load("./texture_grass.jpg");
+grassTexture.wrapS = grassTexture.wrapT = RepeatWrapping;
+grassTexture.repeat.set(100, 100);
+
+const SIZE = 100;
+const SCALE = 1.5;
+const AMPLITUDE = 30;
+const OVERLAP = 0.5;
+const GEOMETRY = 50;
+const CHUNK_SIZE = 100;
+
+const ADJUSTED_GEOMETRY = GEOMETRY + OVERLAP * 2;
+const ADJUSTED_SIZE = SIZE + OVERLAP * 2;
+const ADJUSTED_SCALE = SIZE / SCALE;
+
 export function Chunk(props: { position: Vector2; seed: number }): JSX.Element {
-  const size = 100;
-  const scale = 1.5;
-  const amplitude = 30;
-  const overlap = 0.5;
-  const geometry = 50;
-  const chunkSize = 100;
-
-  const adjustedGeometry = geometry + overlap * 2;
-
   const noise = (x: number, y: number): number => {
     const noise = new ImprovedNoise();
     return noise.noise(x, y, props.seed);
   };
 
-  const canvas = document.createElement("canvas");
-  canvas.width = size + overlap * 2;
-  canvas.height = size + overlap * 2;
-  const context = canvas.getContext("2d");
+  canvas.width = canvas.height = ADJUSTED_SIZE;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("Canvas context not found");
 
-  const offsetX = -overlap + props.position.x;
-  const offsetY = -overlap + props.position.y;
+  const offsetX = -OVERLAP + props.position.x;
+  const offsetY = -OVERLAP + props.position.y;
 
-  const imageData = context.getImageData(
-    0,
-    0,
-    size + overlap * 2,
-    size + overlap * 2
-  );
+  const imageData = context.getImageData(0, 0, ADJUSTED_SIZE, ADJUSTED_SIZE);
   const data = imageData.data;
 
-  for (let x = 0; x < size + overlap * 2; x++) {
-    for (let y = 0; y < size + overlap * 2; y++) {
+  for (let x = 0; x < ADJUSTED_SIZE; x++) {
+    for (let y = 0; y < ADJUSTED_SIZE; y++) {
       const n =
-        noise((x + offsetX) / (size / scale), (y + offsetY) / (size / scale)) *
+        noise((x + offsetX) / ADJUSTED_SCALE, (y + offsetY) / ADJUSTED_SCALE) *
           127 +
         127;
-      const id = (x + y * (size + overlap * 2)) * 4;
+      const id = (x + y * ADJUSTED_SIZE) * 4;
       data[id] = n;
       data[id + 1] = n;
       data[id + 2] = n;
@@ -57,9 +59,11 @@ export function Chunk(props: { position: Vector2; seed: number }): JSX.Element {
   const displacementMap = new TextureLoader().load(canvas.toDataURL());
   displacementMap.wrapS = displacementMap.wrapT = ClampToEdgeWrapping;
 
-  const grassTexture = new TextureLoader().load("./texture_grass.jpg");
-  grassTexture.wrapS = grassTexture.wrapT = RepeatWrapping;
-  grassTexture.repeat.set(100, 100);
+  useEffect(() => {
+    return () => {
+      displacementMap.dispose();
+    };
+  }, [displacementMap]);
 
   return (
     <group position={new Vector3(props.position.x, 0, props.position.y)}>
@@ -71,14 +75,14 @@ export function Chunk(props: { position: Vector2; seed: number }): JSX.Element {
       >
         <planeGeometry
           attach="geometry"
-          args={[chunkSize, chunkSize, adjustedGeometry, adjustedGeometry]}
+          args={[CHUNK_SIZE, CHUNK_SIZE, ADJUSTED_GEOMETRY, ADJUSTED_GEOMETRY]}
         ></planeGeometry>
         <meshStandardMaterial
           toneMapped={false}
           attach="material"
           map={grassTexture}
           displacementMap={displacementMap}
-          displacementScale={amplitude}
+          displacementScale={AMPLITUDE}
           shadowSide={FrontSide}
         />
       </mesh>
